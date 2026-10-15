@@ -17,13 +17,16 @@ final class CatalogViewModel {
 
     var quotes: [Quote] = []
     var isLoading = false
+    var errorMessage: String?
 
     func load() {
         quotes = (try? repository.readAll()) ?? []
     }
 
     func importFromAPI() async {
+        guard !isLoading else { return }
         isLoading = true
+        errorMessage = nil
         defer { isLoading = false }
 
         let skip = settings.importSkip
@@ -31,25 +34,33 @@ final class CatalogViewModel {
         async let firstPage = api.fetchPage(limit: pageLimit, skip: skip)
         async let secondPage = api.fetchPage(limit: pageLimit, skip: skip + pageLimit)
 
-        guard let pages = try? await [firstPage, secondPage],
-              let imported = try? repository.importedRemoteIDs() else { return }
-
-        let remoteQuotes = pages.flatMap { $0.quotes }
-        for remote in remoteQuotes where !imported.contains(remote.id) {
-            try? repository.create(text: remote.quote, author: remote.author, remoteID: remote.id)
+        do {
+            let pages = try await [firstPage, secondPage]
+            var imported = try repository.importedRemoteIDs()
+            let remoteQuotes = pages.flatMap { $0.quotes }
+            for remote in remoteQuotes where !imported.contains(remote.id) {
+                try repository.create(text: remote.quote, author: remote.author, remoteID: remote.id)
+                imported.insert(remote.id)
+            }
+            let next = skip + remoteQuotes.count
+            settings.importSkip = next >= pages[0].total ? 0 : next
+            quotes = try repository.readAll()
+        } catch is CancellationError {
+            return
+        } catch {
+            errorMessage = error.localizedDescription
         }
-
-        let next = skip + remoteQuotes.count
-        settings.importSkip = next >= pages[0].total ? 0 : next
-        load()
     }
 
-    func update(_ quote: Quote, text: String, author: String) {
+    func update(_ quote: Quote, text: String, author: String) async throws {
         var updated = quote
         updated.text = text
         updated.author = author
-        try? repository.update(updated)
-        load()
+        let post = try await api.publish(updated)
+        updated.text = post.body
+        updated.author = post.title
+        try repository.update(updated)
+        quotes = try repository.readAll()
     }
 
     func toggleFavorite(_ quote: Quote) {
