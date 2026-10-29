@@ -16,11 +16,13 @@ struct CatalogView: View {
             List {
                 ForEach(viewModel.quotes) { quote in
                     Button {
+                        viewModel.errorMessage = nil
                         editedQuote = quote
                     } label: {
                         QuoteRow(quote: quote)
                     }
                     .buttonStyle(.plain)
+                    .disabled(viewModel.isLoading)
                     .swipeActions(edge: .leading) {
                         Button(quote.isFavorite ? "Убрать" : "В избранное") {
                             viewModel.toggleFavorite(quote)
@@ -39,6 +41,12 @@ struct CatalogView: View {
             }
             .navigationTitle("Каталог")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .accessibilityLabel("Выполняется запрос")
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Загрузить") {
                         Task { await viewModel.importFromAPI() }
@@ -48,8 +56,16 @@ struct CatalogView: View {
             }
             .sheet(item: $editedQuote) { quote in
                 QuoteFormView(quote: quote) { text, author in
-                    viewModel.update(quote, text: text, author: author)
+                    try await viewModel.update(quote, text: text, author: author)
                 }
+            }
+            .alert("Ошибка", isPresented: Binding(
+                get: { viewModel.errorMessage != nil },
+                set: { if !$0 { viewModel.errorMessage = nil } }
+            )) {
+                Button("ОК", role: .cancel) { viewModel.errorMessage = nil }
+            } message: {
+                Text(viewModel.errorMessage ?? "")
             }
         }
         .onAppear { viewModel.load() }
