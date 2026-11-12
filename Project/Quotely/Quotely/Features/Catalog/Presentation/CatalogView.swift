@@ -11,6 +11,10 @@ struct CatalogView: View {
     @State private var viewModel = CatalogViewModel()
     @State private var editedQuote: Quote?
 
+    private func favoriteActionTitle(for quote: Quote) -> LocalizedStringKey {
+        quote.isFavorite ? "catalog.remove" : "catalog.favorite"
+    }
+
     var body: some View {
         NavigationStack {
             List {
@@ -24,7 +28,7 @@ struct CatalogView: View {
                     .buttonStyle(.plain)
                     .disabled(viewModel.isLoading)
                     .swipeActions(edge: .leading) {
-                        Button(quote.isFavorite ? "Убрать" : "В избранное") {
+                        Button(favoriteActionTitle(for: quote)) {
                             viewModel.toggleFavorite(quote)
                         }
                     }
@@ -33,22 +37,22 @@ struct CatalogView: View {
             }
             .overlay {
                 if viewModel.quotes.isEmpty {
-                    Text("Нет цитат. Нажмите «Загрузить».")
+                    Text("catalog.empty")
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                         .padding()
                 }
             }
-            .navigationTitle("Каталог")
+            .navigationTitle("catalog.title")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     if viewModel.isLoading {
                         ProgressView()
-                            .accessibilityLabel("Выполняется запрос")
+                            .accessibilityLabel("catalog.loading")
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Загрузить") {
+                    Button("catalog.load") {
                         Task { await viewModel.importFromAPI() }
                     }
                     .disabled(viewModel.isLoading)
@@ -59,11 +63,11 @@ struct CatalogView: View {
                     try await viewModel.update(quote, text: text, author: author)
                 }
             }
-            .alert("Ошибка", isPresented: Binding(
+            .alert("error.title", isPresented: Binding(
                 get: { viewModel.errorMessage != nil },
                 set: { if !$0 { viewModel.errorMessage = nil } }
             )) {
-                Button("ОК", role: .cancel) { viewModel.errorMessage = nil }
+                Button("common.ok", role: .cancel) { viewModel.errorMessage = nil }
             } message: {
                 Text(viewModel.errorMessage ?? "")
             }

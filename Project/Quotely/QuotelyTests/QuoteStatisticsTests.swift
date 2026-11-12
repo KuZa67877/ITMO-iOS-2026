@@ -5,12 +5,11 @@
 //  Created by Egor Kuzminykh on 22.10.2026.
 //
 
-import XCTest
 @testable import Quotely
+import XCTest
 
 @MainActor
 final class QuoteStatisticsTests: XCTestCase {
-
     func testEmptyListGivesZeroStatistics() async {
         let statistics = await QuoteStatistics.calculate(for: [])
 

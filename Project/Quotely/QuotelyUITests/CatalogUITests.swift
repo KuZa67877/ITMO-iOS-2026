@@ -8,12 +8,12 @@
 import XCTest
 
 final class CatalogUITests: XCTestCase {
+    private var app = XCUIApplication()
 
-    private var app: XCUIApplication!
-
-    override func setUpWithError() throws {
+    override func setUpWithError() {
         continueAfterFailure = false
         app = XCUIApplication()
+        app.launchArguments += ["-AppleLanguages", "(ru)", "-AppleLocale", "ru_RU"]
         app.launch()
     }
 

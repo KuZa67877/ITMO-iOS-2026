@@ -21,28 +21,31 @@ enum APIError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidURL:
-            return "Не удалось сформировать адрес запроса."
+            return String(localized: "error.invalid_url")
         case .invalidResponse:
-            return "Сервер вернул некорректный ответ."
+            return String(localized: "error.invalid_response")
         case .noInternet:
-            return "Нет подключения к интернету. Проверьте соединение и повторите попытку."
+            return String(localized: "error.no_internet")
         case .timedOut:
-            return "Сервер не ответил вовремя. Повторите попытку."
+            return String(localized: "error.timed_out")
         case .connectionFailed:
-            return "Не удалось связаться с сервером. Повторите попытку."
+            return String(localized: "error.connection_failed")
         case let .http(status, message):
-            let details = message ?? "Повторите попытку позже."
+            let details = message ?? String(localized: "error.http.default_details")
             if status >= 500 {
-                return "Сервер временно недоступен (HTTP \(status)). \(details)"
-            } else {
-                return "Запрос не принят сервером (HTTP \(status)). \(details)"
+                return String(
+                    format: String(localized: "error.http.server"),
+                    status,
+                    details
+                )
             }
+            return String(format: String(localized: "error.http.client"), status, details)
         case .encoding:
-            return "Не удалось подготовить данные для отправки."
+            return String(localized: "error.encoding")
         case .decoding:
-            return "Не удалось прочитать данные сервера: неожиданный формат ответа."
+            return String(localized: "error.decoding")
         case .unknown:
-            return "Неизвестная ошибка при обращении к серверу. Повторите попытку."
+            return String(localized: "error.unknown")
         }
     }
 }

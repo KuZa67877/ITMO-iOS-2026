@@ -21,8 +21,8 @@ nonisolated struct QuoteStatistics {
 
         return QuoteStatistics(
             total: quotes.count,
-            favorites: quotes.filter { $0.isFavorite }.count,
-            authors: Set(quotes.map { $0.author }).count,
+            favorites: quotes.filter(\.isFavorite).count,
+            authors: Set(quotes.map(\.author)).count,
             averageLength: quotes.reduce(0) { $0 + $1.text.count } / quotes.count
         )
     }

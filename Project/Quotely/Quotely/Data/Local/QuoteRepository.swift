@@ -19,7 +19,7 @@ final class QuoteRepository {
             container = try ModelContainer(for: QuoteEntity.self)
             context = container.mainContext
         } catch {
-            fatalError("Не удалось открыть базу SwiftData: \(error)")
+            fatalError("Failed to open SwiftData store: \(error)")
         }
     }
 
@@ -54,7 +54,7 @@ final class QuoteRepository {
 
     func importedRemoteIDs() throws -> Set<Int> {
         let entities = try context.fetch(FetchDescriptor<QuoteEntity>())
-        return Set(entities.compactMap { $0.remoteID })
+        return Set(entities.compactMap(\.remoteID))
     }
 
     func update(_ quote: Quote) throws {

@@ -8,13 +8,12 @@
 import XCTest
 
 final class QuotelyUITestsLaunchTests: XCTestCase {
-
-    override func setUpWithError() throws {
+    override func setUpWithError() {
         continueAfterFailure = false
     }
 
     @MainActor
-    func testLaunch() throws {
+    func testLaunch() {
         let app = XCUIApplication()
         app.launch()
 

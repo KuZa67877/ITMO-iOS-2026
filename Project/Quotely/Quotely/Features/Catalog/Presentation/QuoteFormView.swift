@@ -30,16 +30,22 @@ struct QuoteFormView: View {
 
     private var validationError: String? {
         if trimmedText.isEmpty {
-            return "Введите текст цитаты."
+            return String(localized: "form.validation.text_empty")
         }
         if trimmedAuthor.isEmpty {
-            return "Укажите автора."
+            return String(localized: "form.validation.author_empty")
         }
         if trimmedText.count > maxTextLength {
-            return "Текст цитаты не должен быть длиннее \(maxTextLength) символов."
+            return String(
+                format: String(localized: "form.validation.text_length"),
+                maxTextLength
+            )
         }
         if trimmedAuthor.count > maxAuthorLength {
-            return "Имя автора не должно быть длиннее \(maxAuthorLength) символов."
+            return String(
+                format: String(localized: "form.validation.author_length"),
+                maxAuthorLength
+            )
         }
         return nil
     }
@@ -47,11 +53,11 @@ struct QuoteFormView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Текст") {
-                    TextField("Текст цитаты", text: $text, axis: .vertical)
+                Section("form.text") {
+                    TextField("form.text_field", text: $text, axis: .vertical)
                 }
-                Section("Автор") {
-                    TextField("Автор", text: $author)
+                Section("form.author") {
+                    TextField("form.author", text: $author)
                 }
                 if let validationError, !isSaving {
                     Section {
@@ -62,10 +68,10 @@ struct QuoteFormView: View {
                 }
             }
             .disabled(isSaving)
-            .navigationTitle("Изменить цитату")
+            .navigationTitle("form.edit_title")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Отмена") { dismiss() }
+                    Button("common.cancel") { dismiss() }
                         .disabled(isSaving)
                 }
                 ToolbarItem(placement: .confirmationAction) {
@@ -74,9 +80,9 @@ struct QuoteFormView: View {
                     } label: {
                         if isSaving {
                             ProgressView()
-                                .accessibilityLabel("Сохранение цитаты")
+                                .accessibilityLabel("form.saving")
                         } else {
-                            Text("Сохранить")
+                            Text("form.save")
                         }
                     }
                     .disabled(isSaving || validationError != nil)
@@ -86,11 +92,11 @@ struct QuoteFormView: View {
                 text = quote.text
                 author = quote.author
             }
-            .alert("Не удалось сохранить цитату", isPresented: Binding(
+            .alert("form.save_error", isPresented: Binding(
                 get: { errorMessage != nil },
                 set: { if !$0 { errorMessage = nil } }
             )) {
-                Button("ОК", role: .cancel) { errorMessage = nil }
+                Button("common.ok", role: .cancel) { errorMessage = nil }
             } message: {
                 Text(errorMessage ?? "")
             }

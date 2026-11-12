@@ -11,39 +11,51 @@ struct TodayView: View {
     @State private var viewModel = TodayViewModel()
     @AppStorage(SettingsStorage.Key.showAuthor) private var showAuthor = true
 
+    private var favoriteActionTitle: LocalizedStringKey {
+        viewModel.quote?.isFavorite == true ? "today.remove_favorite" : "today.favorite"
+    }
+
     var body: some View {
         NavigationStack {
             Group {
                 if let quote = viewModel.quote {
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 20) {
+                        Image(systemName: "quote.opening")
+                            .font(.title2)
+                            .foregroundStyle(.tint)
+                            .accessibilityHidden(true)
+
                         Text(quote.text)
-                            .font(.title3)
+                            .font(.title2.weight(.medium))
 
                         if showAuthor {
                             Text(quote.author)
                                 .foregroundStyle(.secondary)
                         }
 
-                        Button(quote.isFavorite ? "Убрать из избранного" : "В избранное") {
+                        Button(favoriteActionTitle) {
                             viewModel.toggleFavorite()
                         }
                         .buttonStyle(.bordered)
 
                         Spacer()
 
-                        Button("Показать другую") {
+                        Button {
                             viewModel.pickNew()
+                        } label: {
+                            Label("today.another", systemImage: "arrow.triangle.2.circlepath")
                         }
                         .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
                         .frame(maxWidth: .infinity)
                     }
                     .padding()
                 } else {
-                    Text("Нет цитат. Загрузите их в «Каталоге».")
+                    Text("today.empty")
                         .foregroundStyle(.secondary)
                 }
             }
-            .navigationTitle("Цитата дня")
+            .navigationTitle("today.title")
         }
         .onAppear { viewModel.load() }
     }

@@ -37,7 +37,7 @@ final class CatalogViewModel {
         do {
             let pages = try await [firstPage, secondPage]
             var imported = try repository.importedRemoteIDs()
-            let remoteQuotes = pages.flatMap { $0.quotes }
+            let remoteQuotes = pages.flatMap(\.quotes)
 
             for remote in remoteQuotes {
                 let text = remote.quote.trimmingCharacters(in: .whitespacesAndNewlines)

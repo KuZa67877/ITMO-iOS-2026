@@ -13,15 +13,25 @@ struct QuoteRow: View {
     @AppStorage(SettingsStorage.Key.showAuthor) private var showAuthor = true
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(quote.text)
+        HStack(alignment: .top, spacing: 12) {
+            if quote.isFavorite {
+                Image(systemName: "heart.fill")
+                    .foregroundStyle(.pink)
+                    .accessibilityHidden(true)
+            }
 
-            if showAuthor {
-                Text(quote.author)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(quote.text)
+                    .font(.body.weight(.medium))
+
+                if showAuthor {
+                    Text(quote.author)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
-        .badge(quote.isFavorite ? "В избранном" : nil)
+        .padding(.vertical, 4)
+        .badge(quote.isFavorite ? String(localized: "quote.favorite") : nil)
     }
 }

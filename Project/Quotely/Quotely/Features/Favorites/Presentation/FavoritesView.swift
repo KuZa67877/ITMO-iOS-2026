@@ -16,7 +16,7 @@ struct FavoritesView: View {
                 ForEach(viewModel.quotes) { quote in
                     QuoteRow(quote: quote)
                         .swipeActions(edge: .leading) {
-                            Button("Убрать") {
+                            Button("catalog.remove") {
                                 viewModel.removeFromFavorites(quote)
                             }
                         }
@@ -25,13 +25,13 @@ struct FavoritesView: View {
             }
             .overlay {
                 if viewModel.quotes.isEmpty {
-                    Text("Избранное пусто. Отметьте цитаты в «Каталоге».")
+                    Text("favorites.empty")
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                         .padding()
                 }
             }
-            .navigationTitle("Избранное")
+            .navigationTitle("favorites.title")
         }
         .onAppear { viewModel.load() }
     }

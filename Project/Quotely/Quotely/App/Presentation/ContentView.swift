@@ -12,23 +12,24 @@ struct ContentView: View {
         TabView {
             TodayView()
                 .tabItem {
-                    Label("Сегодня", systemImage: "sun.max")
+                    Label("tab.today", systemImage: "sun.max")
                 }
 
             CatalogView()
                 .tabItem {
-                    Label("Каталог", systemImage: "square.grid.2x2")
+                    Label("tab.catalog", systemImage: "square.grid.2x2")
                 }
 
             FavoritesView()
                 .tabItem {
-                    Label("Избранное", systemImage: "heart")
+                    Label("tab.favorites", systemImage: "heart")
                 }
 
             SettingsView()
                 .tabItem {
-                    Label("Настройки", systemImage: "gearshape")
+                    Label("tab.settings", systemImage: "gearshape")
                 }
         }
+        .tint(.indigo)
     }
 }

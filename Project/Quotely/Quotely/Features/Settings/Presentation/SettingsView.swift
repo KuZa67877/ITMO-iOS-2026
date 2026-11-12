@@ -14,27 +14,33 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Отображение") {
-                    Toggle("Показывать автора", isOn: $showAuthor)
+                Section("settings.display") {
+                    Toggle("settings.show_author", isOn: $showAuthor)
                 }
 
-                Section("Хранилище") {
-                    LabeledContent("Всего цитат", value: "\(viewModel.statistics.total)")
-                    LabeledContent("В избранном", value: "\(viewModel.statistics.favorites)")
-                    LabeledContent("Авторов", value: "\(viewModel.statistics.authors)")
-                    LabeledContent("Средняя длина", value: "\(viewModel.statistics.averageLength)")
+                Section("settings.storage") {
+                    LabeledContent("settings.total", value: "\(viewModel.statistics.total)")
+                    LabeledContent(
+                        "settings.favorite_count",
+                        value: "\(viewModel.statistics.favorites)"
+                    )
+                    LabeledContent("settings.authors", value: "\(viewModel.statistics.authors)")
+                    LabeledContent(
+                        "settings.average_length",
+                        value: "\(viewModel.statistics.averageLength)"
+                    )
                 }
 
                 Section {
-                    Button("Сбросить настройки") {
+                    Button("settings.reset") {
                         viewModel.resetSettings()
                     }
-                    Button("Удалить все цитаты", role: .destructive) {
+                    Button("settings.delete_all", role: .destructive) {
                         Task { await viewModel.deleteAllQuotes() }
                     }
                 }
             }
-            .navigationTitle("Настройки")
+            .navigationTitle("settings.title")
         }
         .task { await viewModel.load() }
     }
